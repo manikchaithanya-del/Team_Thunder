@@ -5,16 +5,11 @@ import { useEffect } from 'react';
 
 export default function Header() {
   const location = useLocation();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, initializeTheme } = useTheme();
 
   useEffect(() => {
-    const htmlElement = document.documentElement;
-    if (theme === 'dark') {
-      htmlElement.classList.add('dark');
-    } else {
-      htmlElement.classList.remove('dark');
-    }
-  }, [theme]);
+    initializeTheme();
+  }, [initializeTheme]);
 
   const navLinks = [
     { label: 'Dashboard', path: '/' },

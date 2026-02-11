@@ -5,30 +5,41 @@ interface ThemeStore {
   theme: 'light' | 'dark';
   toggleTheme: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
+  initializeTheme: () => void;
 }
+
+const applyTheme = (theme: 'light' | 'dark') => {
+  if (typeof document !== 'undefined') {
+    const htmlElement = document.documentElement;
+    if (theme === 'dark') {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
+  }
+};
 
 export const useTheme = create<ThemeStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       theme: 'light',
       toggleTheme: () =>
-        set((state) => ({
-          theme: state.theme === 'light' ? 'dark' : 'light',
-        })),
-      setTheme: (theme) => set({ theme }),
+        set((state) => {
+          const newTheme = state.theme === 'light' ? 'dark' : 'light';
+          applyTheme(newTheme);
+          return { theme: newTheme };
+        }),
+      setTheme: (theme) => {
+        applyTheme(theme);
+        set({ theme });
+      },
+      initializeTheme: () => {
+        const state = get();
+        applyTheme(state.theme);
+      },
     }),
     {
       name: 'theme-storage',
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          const htmlElement = document.documentElement;
-          if (state.theme === 'dark') {
-            htmlElement.classList.add('dark');
-          } else {
-            htmlElement.classList.remove('dark');
-          }
-        }
-      },
     }
   )
 );
