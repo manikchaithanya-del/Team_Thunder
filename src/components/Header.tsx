@@ -1,8 +1,20 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Activity } from 'lucide-react';
+import { Activity, Moon, Sun } from 'lucide-react';
+import { useTheme } from '@/hooks/use-theme';
+import { useEffect } from 'react';
 
 export default function Header() {
   const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
+
+  useEffect(() => {
+    const htmlElement = document.documentElement;
+    if (theme === 'dark') {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   const navLinks = [
     { label: 'Dashboard', path: '/' },
@@ -13,7 +25,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="w-full bg-background border-b border-medium-grey">
+    <header className="w-full bg-background border-b border-medium-grey transition-colors duration-300">
       <div className="max-w-[100rem] mx-auto px-8">
         <div className="flex items-center justify-between h-20">
           <Link to="/" className="flex items-center gap-3">
@@ -38,6 +50,18 @@ export default function Header() {
               </Link>
             ))}
           </nav>
+
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-lg bg-light-grey hover:bg-medium-grey transition-colors duration-300"
+            aria-label="Toggle theme"
+          >
+            {theme === 'light' ? (
+              <Moon className="w-5 h-5 text-foreground" />
+            ) : (
+              <Sun className="w-5 h-5 text-foreground" />
+            )}
+          </button>
         </div>
       </div>
     </header>

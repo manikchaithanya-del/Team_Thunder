@@ -1,11 +1,12 @@
 // HPI 1.7-G
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Activity, Users, Pill, FlaskConical, ClipboardList, ArrowRight, CheckCircle2, Clock, ShieldAlert } from 'lucide-react';
 import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Image } from '@/components/ui/image';
+import { useTheme } from '@/hooks/use-theme';
 
 // --- Types & Interfaces ---
 interface StatItem {
@@ -33,6 +34,8 @@ const VerticalDivider = ({ className = "" }: { className?: string }) => (
 );
 
 export default function HomePage() {
+  const { theme } = useTheme();
+  
   // --- Canonical Data Sources ---
   const stats: StatItem[] = [
     { label: 'Active Patients', value: '247', icon: Users },
@@ -82,8 +85,17 @@ export default function HomePage() {
   const heroY = useTransform(scrollYProgress, [0, 0.2], [0, 150]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
+  useEffect(() => {
+    const htmlElement = document.documentElement;
+    if (theme === 'dark') {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
+  }, [theme]);
+
   return (
-    <div ref={containerRef} className="min-h-screen bg-background text-foreground font-paragraph selection:bg-foreground selection:text-background overflow-clip">
+    <div ref={containerRef} className="min-h-screen bg-background text-foreground font-paragraph selection:bg-foreground selection:text-background overflow-clip transition-colors duration-300">
       <Header />
 
       <main className="flex-1 flex flex-col w-full">
@@ -137,9 +149,9 @@ export default function HomePage() {
             {/* Hero Visual - Abstract Representation of Flow */}
             <div className="lg:col-span-4 h-full min-h-[40vh] lg:min-h-auto relative hidden lg:block">
                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative w-full aspect-[3/4] overflow-hidden bg-light-grey">
+                  <div className="relative w-full aspect-[3/4] overflow-hidden bg-light-grey rounded-lg">
                     <Image 
-                      src="https://static.wixstatic.com/media/98a406_943c0eeb1e41495ea532e01c17d9600a~mv2.png?originWidth=576&originHeight=768"
+                      src="https://static.wixstatic.com/media/98a406_0fd7491d9f3f495d82d948cdc00202de~mv2.png"
                       alt="Medical Workflow Abstract"
                       className="w-full h-full object-cover opacity-80 grayscale contrast-125"
                     />

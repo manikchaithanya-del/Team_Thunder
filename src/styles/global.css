@@ -3,3 +3,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #FFFFFF;
+    --foreground: #212529;
+    --secondary: #6C757D;
+    --light-grey: #F8F9FA;
+    --medium-grey: #E9ECEF;
+    --accent-link: #007BFF;
+  }
+
+  .dark {
+    --background: #1a1a1a;
+    --foreground: #f5f5f5;
+    --secondary: #b0b0b0;
+    --light-grey: #2d2d2d;
+    --medium-grey: #404040;
+    --accent-link: #4a9eff;
+  }
+
+  body {
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+}
