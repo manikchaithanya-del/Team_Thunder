@@ -222,33 +222,13 @@ export default function PatientsPage() {
                       to={`/patients/${patient._id}`}
                       className="block bg-light-grey p-8 hover:bg-medium-grey transition-colors"
                     >
-                      <div className="flex items-start gap-4 mb-4">
+                      <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center flex-shrink-0">
                           <User className="w-6 h-6 text-primary-foreground" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-heading text-xl font-semibold text-foreground mb-1 truncate">
-                            {patient.fullName}
-                          </h3>
-                          <p className="font-paragraph text-sm text-secondary">
-                            {patient.gender} • {patient.dateOfBirth}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="font-paragraph text-sm text-secondary">Contact:</span>
-                          <span className="font-paragraph text-sm text-foreground">{patient.contactNumber}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="font-paragraph text-sm text-secondary">Status:</span>
-                          <span className={`font-paragraph text-sm font-medium ${
-                            patient.currentStatus === 'Active' ? 'text-foreground' : 'text-secondary'
-                          }`}>
-                            {patient.currentStatus}
-                          </span>
-                        </div>
+                        <h3 className="font-heading text-xl font-semibold text-foreground truncate">
+                          {patient.fullName}
+                        </h3>
                       </div>
                     </Link>
                   </motion.div>
