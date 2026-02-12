@@ -5,6 +5,7 @@ import { Activity, Users, Pill, FlaskConical, ClipboardList, ArrowRight, CheckCi
 import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import AIChatbot from '@/components/AIChatbot';
 import { Image } from '@/components/ui/image';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -363,6 +364,7 @@ export default function HomePage() {
       </main>
 
       <Footer />
+      <AIChatbot />
     </div>
   );
 }
