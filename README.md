@@ -4,7 +4,8 @@
 This project is a hospital ecosystem web application that connects **doctors, laboratories, pharmacies, and patients** on a single digital platform.
 
 Patients can interact with healthcare providers, access medical services, and streamline communication between departments.  
-The system improves efficiency, reduces manual coordination, and provides a smoother healthcare experience.
+The system improves efficiency, reduces manual coordination, and provides a smoother healthcare experience,reduces waiting time, improves coordination, centralizes services.
+
 
 ## 🎯 Target Users
 - Patients
@@ -39,6 +40,13 @@ The system improves efficiency, reduces manual coordination, and provides a smoo
 - **Build Tool**: Vite
 - **Deployment**: Cloudflare
 
+**## 📦 Key Dependencies**
+- React
+- Astro
+- Tailwind CSS
+- Zustand
+- React Hook Form
+- Zod
 
 ## 🚀 Getting Started
 
@@ -64,6 +72,7 @@ The system improves efficiency, reduces manual coordination, and provides a smoo
    ```bash
    npm run dev
    ```
+4. **⏱ Setup time: ~5 minutes**
 
 The development server will start and you can view your site at `http://localhost:4321`.
 
@@ -110,13 +119,10 @@ This template includes a comprehensive set of UI components built with Radix UI 
 - `npm run test:run` - Run tests
 - `npm install` - Install dependencies
 
-## 🧪 Testing
-
-The project includes Vitest for testing:
-
-```bash
-npm run test:run
-```
+## ⚠ Important Instructions
+- This project is integrated with Wix services.
+- Deployment and environment variables are managed via Wix.
+- Use `npm run env` before starting development.
 
 ## 📱 Responsive Design
 
@@ -134,7 +140,9 @@ The template is configured for deployment on Cloudflare:
 ```bash
 npm run build
 ```
-## 🔗 Live Demo
+## 🔗 Live Demo of website 
 👉 https://my-site-bvod0xnm-praveenpalakurthi3.wix-vibe-site.com
 
+8️⃣ Demo Images 🖼
+file:///C:/Users/G.Manik%20Chaitanya/AppData/Local/Packages/5319275A.WhatsAppDesktop_cv1g1gvanyjgm/LocalState/sessions/34645AC5D98D546E75F76E1CACFB02DD2634A15E/transfers/2026-07/Scan%20document2026-02-12%2019-21-34.pdf
 
