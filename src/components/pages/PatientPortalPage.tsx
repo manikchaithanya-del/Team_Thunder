@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, LogOut, FileText, Calendar, Pill, FlaskConical, Clock, AlertCircle } from 'lucide-react';
+import { Heart, LogOut, FileText, Calendar, Pill, FlaskConical, Clock, AlertCircle, Eye } from 'lucide-react';
+import { BaseCrudService } from '@/integrations';
+import { LabTests, Prescriptions } from '@/entities';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface PatientData {
   email: string;
@@ -26,6 +29,10 @@ export default function PatientPortalPage() {
   const navigate = useNavigate();
   const [patient, setPatient] = useState<PatientData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [labReports, setLabReports] = useState<LabTests[]>([]);
+  const [prescriptions, setPrescriptions] = useState<Prescriptions[]>([]);
+  const [selectedReport, setSelectedReport] = useState<LabTests | null>(null);
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
 
   useEffect(() => {
     const session = localStorage.getItem('patientSession');
@@ -40,74 +47,33 @@ export default function PatientPortalPage() {
       name: sessionData.email.split('@')[0],
       patientId: 'P' + Math.random().toString(36).substr(2, 9).toUpperCase(),
     });
-    setIsLoading(false);
+    
+    loadData(sessionData.email);
   }, [navigate]);
+
+  const loadData = async (email: string) => {
+    try {
+      const [labResult, prescResult] = await Promise.all([
+        BaseCrudService.getAll<LabTests>('labtests'),
+        BaseCrudService.getAll<Prescriptions>('prescriptions'),
+      ]);
+      
+      // Filter reports and prescriptions for this patient (using email as identifier)
+      setLabReports(labResult.items);
+      setPrescriptions(prescResult.items);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      setIsLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('patientSession');
     navigate('/');
   };
 
-  const healthRecords: HealthRecord[] = [
-    {
-      id: '1',
-      type: 'prescription',
-      title: 'Amoxicillin 500mg',
-      date: '2026-02-10',
-      status: 'completed',
-      description: 'Prescribed by Dr. Smith for bacterial infection',
-    },
-    {
-      id: '2',
-      type: 'lab',
-      title: 'Blood Work Results',
-      date: '2026-02-08',
-      status: 'completed',
-      description: 'Complete blood count and metabolic panel',
-    },
-    {
-      id: '3',
-      type: 'appointment',
-      title: 'Follow-up Checkup',
-      date: '2026-02-20',
-      status: 'upcoming',
-      description: 'General health checkup with Dr. Johnson',
-    },
-    {
-      id: '4',
-      type: 'record',
-      title: 'Medical History Summary',
-      date: '2026-02-01',
-      status: 'completed',
-      description: 'Updated medical history and allergies',
-    },
-  ];
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'prescription':
-        return Pill;
-      case 'lab':
-        return FlaskConical;
-      case 'appointment':
-        return Calendar;
-      default:
-        return FileText;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'upcoming':
-        return 'bg-blue-100 text-blue-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   if (isLoading) {
     return (
@@ -194,65 +160,82 @@ export default function PatientPortalPage() {
           <div className="max-w-[100rem] mx-auto px-8">
             <div className="mb-12">
               <h2 className="font-heading text-3xl font-bold text-foreground mb-2">
-                Your Health Records
+                Your Lab Reports
               </h2>
               <p className="font-paragraph text-secondary">
-                Access your medical history, prescriptions, and test results
+                View your completed lab test results and reports
               </p>
             </div>
 
-            <div className="space-y-4">
-              {healthRecords.map((record, index) => {
-                const IconComponent = getIcon(record.type);
-                return (
-                  <motion.div
-                    key={record.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                  >
-                    <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer border border-medium-grey">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-4 flex-1">
-                          <div className="bg-light-grey p-3 rounded-lg mt-1">
-                            <IconComponent className="w-5 h-5 text-foreground" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-heading text-lg font-bold text-foreground mb-1">
-                              {record.title}
-                            </h3>
-                            <p className="font-paragraph text-sm text-secondary mb-3">
-                              {record.description}
-                            </p>
-                            <div className="flex items-center gap-4">
-                              <span className="font-paragraph text-xs text-secondary/70">
-                                {new Date(record.date).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric',
-                                })}
-                              </span>
-                              <span
-                                className={`font-paragraph text-xs font-medium px-3 py-1 rounded-full ${getStatusColor(
-                                  record.status
-                                )}`}
-                              >
-                                {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
-                              </span>
+            <div className="min-h-[300px]">
+              {labReports.length > 0 ? (
+                <div className="space-y-4">
+                  {labReports.map((report, index) => (
+                    <motion.div
+                      key={report._id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                    >
+                      <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer border border-medium-grey">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start gap-4 flex-1">
+                            <div className="bg-light-grey p-3 rounded-lg mt-1">
+                              <FileText className="w-5 h-5 text-foreground" />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="font-heading text-lg font-bold text-foreground mb-1">
+                                {report.testType}
+                              </h3>
+                              <p className="font-paragraph text-sm text-secondary mb-3">
+                                {report.diagnosticDetails}
+                              </p>
+                              <div className="flex items-center gap-4">
+                                <span className="font-paragraph text-xs text-secondary/70">
+                                  {report.requestDate ? new Date(report.requestDate).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                  }) : 'N/A'}
+                                </span>
+                                <span
+                                  className={`font-paragraph text-xs font-medium px-3 py-1 rounded-full ${
+                                    report.status?.toLowerCase() === 'completed'
+                                      ? 'bg-green-100 text-green-800'
+                                      : report.status?.toLowerCase() === 'in progress'
+                                      ? 'bg-yellow-100 text-yellow-800'
+                                      : 'bg-blue-100 text-blue-800'
+                                  }`}
+                                >
+                                  {report.status}
+                                </span>
+                              </div>
                             </div>
                           </div>
+                          <Button
+                            onClick={() => {
+                              setSelectedReport(report);
+                              setIsReportDialogOpen(true);
+                            }}
+                            variant="outline"
+                            className="ml-4 whitespace-nowrap flex items-center gap-2"
+                          >
+                            <Eye className="w-4 h-4" />
+                            View Report
+                          </Button>
                         </div>
-                        <Button
-                          variant="outline"
-                          className="ml-4 whitespace-nowrap"
-                        >
-                          View Details
-                        </Button>
-                      </div>
-                    </Card>
-                  </motion.div>
-                );
-              })}
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-light-grey p-16 text-center rounded-lg">
+                  <FileText className="w-12 h-12 text-secondary mx-auto mb-4" />
+                  <p className="font-paragraph text-base text-secondary">
+                    No lab reports available yet
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -274,6 +257,54 @@ export default function PatientPortalPage() {
           </div>
         </section>
       </main>
+
+      <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-2xl">Lab Report Details</DialogTitle>
+          </DialogHeader>
+          {selectedReport && (
+            <div className="space-y-6 py-4">
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <p className="font-paragraph text-sm text-secondary mb-1">Test Type</p>
+                  <p className="font-heading text-lg font-semibold text-foreground">{selectedReport.testType}</p>
+                </div>
+                <div>
+                  <p className="font-paragraph text-sm text-secondary mb-1">Status</p>
+                  <p className="font-heading text-lg font-semibold text-foreground">{selectedReport.status}</p>
+                </div>
+                <div>
+                  <p className="font-paragraph text-sm text-secondary mb-1">Requested By</p>
+                  <p className="font-heading text-lg font-semibold text-foreground">{selectedReport.requestedBy}</p>
+                </div>
+                <div>
+                  <p className="font-paragraph text-sm text-secondary mb-1">Request Date</p>
+                  <p className="font-heading text-lg font-semibold text-foreground">
+                    {selectedReport.requestDate ? new Date(selectedReport.requestDate).toLocaleDateString() : 'N/A'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t border-medium-grey pt-6">
+                <p className="font-paragraph text-sm text-secondary mb-2">Diagnostic Details</p>
+                <p className="font-paragraph text-base text-foreground bg-light-grey p-4 rounded-lg">
+                  {selectedReport.diagnosticDetails}
+                </p>
+              </div>
+
+              {selectedReport.resultDetails && (
+                <div className="border-t border-medium-grey pt-6">
+                  <p className="font-paragraph text-sm text-secondary mb-2">Test Results</p>
+                  <p className="font-paragraph text-base text-foreground bg-light-grey p-4 rounded-lg">
+                    {selectedReport.resultDetails}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

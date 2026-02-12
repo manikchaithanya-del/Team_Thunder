@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Pill, FlaskConical, CheckCircle } from 'lucide-react';
+import { Pill, FlaskConical, CheckCircle, FileText, Eye } from 'lucide-react';
 import { BaseCrudService } from '@/integrations';
 import { Patients, Prescriptions, LabTests } from '@/entities';
 import Header from '@/components/Header';
@@ -12,11 +12,15 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export default function DoctorPortalPage() {
   const navigate = useNavigate();
   const [patients, setPatients] = useState<Patients[]>([]);
+  const [labTests, setLabTests] = useState<LabTests[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
+  const [selectedLabReport, setSelectedLabReport] = useState<LabTests | null>(null);
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   
   const [prescriptionForm, setPrescriptionForm] = useState({
     patientId: '',
@@ -40,15 +44,19 @@ export default function DoctorPortalPage() {
       navigate('/doctor-login');
       return;
     }
-    loadPatients();
+    loadData();
   }, [navigate]);
 
-  const loadPatients = async () => {
+  const loadData = async () => {
     try {
-      const result = await BaseCrudService.getAll<Patients>('patients');
-      setPatients(result.items);
+      const [patientsResult, labTestsResult] = await Promise.all([
+        BaseCrudService.getAll<Patients>('patients'),
+        BaseCrudService.getAll<LabTests>('labtests'),
+      ]);
+      setPatients(patientsResult.items);
+      setLabTests(labTestsResult.items);
     } catch (error) {
-      console.error('Error loading patients:', error);
+      console.error('Error loading data:', error);
     }
   };
 
@@ -142,7 +150,7 @@ export default function DoctorPortalPage() {
           )}
 
           <Tabs defaultValue="prescription" className="w-full">
-            <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
+            <TabsList className="grid w-full max-w-md grid-cols-3 mb-8">
               <TabsTrigger value="prescription" className="flex items-center gap-2">
                 <Pill className="w-4 h-4" />
                 Prescription
@@ -150,6 +158,10 @@ export default function DoctorPortalPage() {
               <TabsTrigger value="labtest" className="flex items-center gap-2">
                 <FlaskConical className="w-4 h-4" />
                 Lab Test
+              </TabsTrigger>
+              <TabsTrigger value="reports" className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Reports
               </TabsTrigger>
             </TabsList>
 
@@ -298,9 +310,125 @@ export default function DoctorPortalPage() {
                 </div>
               </div>
             </TabsContent>
+
+            <TabsContent value="reports">
+              <div className="max-w-3xl">
+                <h2 className="font-heading text-2xl font-semibold text-foreground mb-8">
+                  Lab Reports
+                </h2>
+
+                <div className="min-h-[300px]">
+                  {labTests.length > 0 ? (
+                    <div className="space-y-4">
+                      {labTests.map((report, index) => (
+                        <motion.div
+                          key={report._id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: index * 0.05 }}
+                          className="bg-light-grey p-6 rounded-lg border border-medium-grey hover:border-accent-link transition-colors"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-3">
+                                <FileText className="w-5 h-5 text-accent-link" />
+                                <h3 className="font-heading text-lg font-semibold text-foreground">
+                                  {report.testType}
+                                </h3>
+                              </div>
+                              <div className="space-y-2 mb-4">
+                                <p className="font-paragraph text-sm text-secondary">
+                                  <span className="font-medium">Patient:</span> {report.patientId}
+                                </p>
+                                <p className="font-paragraph text-sm text-secondary">
+                                  <span className="font-medium">Status:</span> {report.status}
+                                </p>
+                                <p className="font-paragraph text-sm text-secondary">
+                                  <span className="font-medium">Requested by:</span> {report.requestedBy}
+                                </p>
+                                <p className="font-paragraph text-sm text-secondary">
+                                  <span className="font-medium">Date:</span>{' '}
+                                  {report.requestDate ? new Date(report.requestDate).toLocaleDateString() : 'N/A'}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              onClick={() => {
+                                setSelectedLabReport(report);
+                                setIsReportDialogOpen(true);
+                              }}
+                              variant="outline"
+                              className="flex items-center gap-2 ml-4"
+                            >
+                              <Eye className="w-4 h-4" />
+                              View Report
+                            </Button>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="bg-light-grey p-16 text-center rounded-lg">
+                      <FileText className="w-12 h-12 text-secondary mx-auto mb-4" />
+                      <p className="font-paragraph text-base text-secondary">
+                        No lab reports available
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
           </Tabs>
         </div>
       </main>
+
+      <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-2xl">Lab Report</DialogTitle>
+          </DialogHeader>
+          {selectedLabReport && (
+            <div className="space-y-6 py-4">
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <p className="font-paragraph text-sm text-secondary mb-1">Test Type</p>
+                  <p className="font-heading text-lg font-semibold text-foreground">{selectedLabReport.testType}</p>
+                </div>
+                <div>
+                  <p className="font-paragraph text-sm text-secondary mb-1">Status</p>
+                  <p className="font-heading text-lg font-semibold text-foreground">{selectedLabReport.status}</p>
+                </div>
+                <div>
+                  <p className="font-paragraph text-sm text-secondary mb-1">Requested By</p>
+                  <p className="font-heading text-lg font-semibold text-foreground">{selectedLabReport.requestedBy}</p>
+                </div>
+                <div>
+                  <p className="font-paragraph text-sm text-secondary mb-1">Request Date</p>
+                  <p className="font-heading text-lg font-semibold text-foreground">
+                    {selectedLabReport.requestDate ? new Date(selectedLabReport.requestDate).toLocaleDateString() : 'N/A'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t border-medium-grey pt-6">
+                <p className="font-paragraph text-sm text-secondary mb-2">Diagnostic Details</p>
+                <p className="font-paragraph text-base text-foreground bg-light-grey p-4 rounded-lg">
+                  {selectedLabReport.diagnosticDetails}
+                </p>
+              </div>
+
+              {selectedLabReport.resultDetails && (
+                <div className="border-t border-medium-grey pt-6">
+                  <p className="font-paragraph text-sm text-secondary mb-2">Result Details</p>
+                  <p className="font-paragraph text-base text-foreground bg-light-grey p-4 rounded-lg">
+                    {selectedLabReport.resultDetails}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>
