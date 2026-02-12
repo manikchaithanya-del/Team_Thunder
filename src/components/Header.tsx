@@ -17,6 +17,7 @@ export default function Header() {
     { label: 'Doctor', path: '/doctor-login' },
     { label: 'Pharmacy', path: '/pharmacy-login' },
     { label: 'Lab', path: '/lab-login' },
+    { label: 'Patient', path: '/patient-login' },
   ];
 
   return (

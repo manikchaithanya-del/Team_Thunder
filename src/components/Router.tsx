@@ -11,6 +11,8 @@ import PharmacyPortalPage from '@/components/pages/PharmacyPortalPage';
 import PharmacyLoginPage from '@/components/pages/PharmacyLoginPage';
 import LabPortalPage from '@/components/pages/LabPortalPage';
 import LabLoginPage from '@/components/pages/LabLoginPage';
+import PatientLoginPage from '@/components/pages/PatientLoginPage';
+import PatientPortalPage from '@/components/pages/PatientPortalPage';
 
 // Layout component that includes ScrollToTop
 function Layout() {
@@ -89,6 +91,20 @@ const router = createBrowserRouter([
         element: <LabPortalPage />,
         routeMetadata: {
           pageIdentifier: 'lab-portal',
+        },
+      },
+      {
+        path: "patient-login",
+        element: <PatientLoginPage />,
+        routeMetadata: {
+          pageIdentifier: 'patient-login',
+        },
+      },
+      {
+        path: "patient-portal",
+        element: <PatientPortalPage />,
+        routeMetadata: {
+          pageIdentifier: 'patient-portal',
         },
       },
       {

@@ -68,9 +68,9 @@ export default function HomePage() {
       color: 'secondary',
     },
     {
-      title: 'Patient Management',
-      description: 'Browse and manage patient records',
-      link: '/patients',
+      title: 'Patient Portal',
+      description: 'Access your health records and medical history',
+      link: '/patient-login',
       icon: Users,
       color: 'primary',
     },
