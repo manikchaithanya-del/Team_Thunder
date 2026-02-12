@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FlaskConical, Clock, CheckCircle, User } from 'lucide-react';
 import { BaseCrudService } from '@/integrations';
@@ -12,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 
 export default function LabPortalPage() {
+  const navigate = useNavigate();
   const [labTests, setLabTests] = useState<LabTests[]>([]);
   const [patients, setPatients] = useState<Record<string, Patients>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -21,8 +23,14 @@ export default function LabPortalPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
+    // Check if user is logged in
+    const labSession = localStorage.getItem('labSession');
+    if (!labSession) {
+      navigate('/lab-login');
+      return;
+    }
     loadData();
-  }, []);
+  }, [navigate]);
 
   const loadData = async () => {
     try {

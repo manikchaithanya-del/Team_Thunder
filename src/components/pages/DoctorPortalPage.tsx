@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Pill, FlaskConical, CheckCircle } from 'lucide-react';
 import { BaseCrudService } from '@/integrations';
@@ -13,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function DoctorPortalPage() {
+  const navigate = useNavigate();
   const [patients, setPatients] = useState<Patients[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
   
@@ -32,8 +34,14 @@ export default function DoctorPortalPage() {
   });
 
   useEffect(() => {
+    // Check if user is logged in
+    const doctorSession = localStorage.getItem('doctorSession');
+    if (!doctorSession) {
+      navigate('/doctor-login');
+      return;
+    }
     loadPatients();
-  }, []);
+  }, [navigate]);
 
   const loadPatients = async () => {
     try {

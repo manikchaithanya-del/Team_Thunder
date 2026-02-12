@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Pill, Clock, CheckCircle, User } from 'lucide-react';
 import { BaseCrudService } from '@/integrations';
@@ -9,14 +10,21 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 
 export default function PharmacyPortalPage() {
+  const navigate = useNavigate();
   const [prescriptions, setPrescriptions] = useState<Prescriptions[]>([]);
   const [patients, setPatients] = useState<Record<string, Patients>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
+    // Check if user is logged in
+    const pharmacySession = localStorage.getItem('pharmacySession');
+    if (!pharmacySession) {
+      navigate('/pharmacy-login');
+      return;
+    }
     loadData();
-  }, []);
+  }, [navigate]);
 
   const loadData = async () => {
     try {
