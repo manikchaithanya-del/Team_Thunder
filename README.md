@@ -1,3 +1,16 @@
+# 🏥 Hospital Connectivity Platform
+
+## 📌 Overview
+This project is a hospital ecosystem web application that connects **doctors, laboratories, pharmacies, and patients** on a single digital platform.
+
+Patients can interact with healthcare providers, access medical services, and streamline communication between departments.  
+The system improves efficiency, reduces manual coordination, and provides a smoother healthcare experience.
+
+## 🎯 Target Users
+- Patients
+- Doctors
+- Laboratory staff
+- Pharmacy staff
 ## 🚀 Features
 
 - **Astro Framework** - Modern static site generator with server-side rendering
@@ -121,11 +134,7 @@ The template is configured for deployment on Cloudflare:
 ```bash
 npm run build
 ```
+## 🔗 Live Demo
+👉 https://my-site-bvod0xnm-praveenpalakurthi3.wix-vibe-site.com
 
-## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
