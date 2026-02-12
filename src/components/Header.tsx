@@ -14,9 +14,9 @@ export default function Header() {
   const navLinks = [
     { label: 'Dashboard', path: '/' },
     { label: 'Patients', path: '/patients' },
-    { label: 'Doctor Portal', path: '/doctor-portal' },
-    { label: 'Pharmacy Portal', path: '/pharmacy-portal' },
-    { label: 'Lab Portal', path: '/lab-portal' },
+    { label: 'Doctor', path: '/doctor-login' },
+    { label: 'Pharmacy', path: '/pharmacy-login' },
+    { label: 'Lab', path: '/lab-login' },
   ];
 
   return (
